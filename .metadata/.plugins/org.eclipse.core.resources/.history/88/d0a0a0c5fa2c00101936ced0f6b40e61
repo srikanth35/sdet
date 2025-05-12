@@ -1,0 +1,81 @@
+package selenium_testng;
+
+
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.*;
+
+import java.time.Duration;
+
+public class MakeMyTripSearchOfFlight {
+    WebDriver driver;
+    WebDriverWait wait;
+
+    @BeforeMethod
+    public void setup() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-notifications");
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        driver.manage().window().maximize();
+        driver.get("https://www.makemytrip.com/");
+    }
+
+    @Test
+    public void testRoundTripFlightSearch() throws InterruptedException {
+        // Dismiss popup
+        Thread.sleep(3000);
+        driver.findElement(By.cssSelector("body")).click();
+
+        // Handle optional "Personal Account" popup
+        try {
+            WebElement popup = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'Personal Account')]")));
+            if (popup.isDisplayed()) {
+                driver.findElement(By.cssSelector("body")).click();
+            }
+        } catch (Exception e) {
+            System.out.println("No 'Personal Account' popup detected.");
+        }
+
+        // Click Flights and Round Trip
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Flights']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li[@data-cy='roundTrip']"))).click();
+
+        // From: HYD
+        driver.findElement(By.id("fromCity")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='From']"))).sendKeys("HYD");
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[contains(text(),'Hyderabad')]"))).click();
+
+        // To: MAA
+        WebElement toInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='To']")));
+        toInput.sendKeys("MAA");
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[contains(text(),'Chennai')]"))).click();
+
+        // Select DEPARTURE date
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//label[@for='departure']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@aria-label='Fri Jun 27 2025']"))).click();
+
+        // Select RETURN date
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@aria-label='Tue Jul 01 2025']"))).click();
+
+        // Click Search
+        driver.findElement(By.xpath("//a[text()='Search']")).click();
+
+        // Verify result page
+        boolean resultPage = wait.until(ExpectedConditions.urlContains("flights/results"));
+        assert resultPage : "Search results page not displayed!";
+    }
+
+    @AfterMethod
+    public void teardown() {
+        driver.quit();
+    }
+}
+

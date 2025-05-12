@@ -1,0 +1,14 @@
+package packagetest;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+public class FirstTest {
+	
+	@Test
+	public void sayHi() {
+		System.out.print("Hi");
+		 Assert.assertEquals(false, false);
+	}
+
+}

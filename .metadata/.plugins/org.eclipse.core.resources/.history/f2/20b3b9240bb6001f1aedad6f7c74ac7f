@@ -1,0 +1,10 @@
+package packagetest;
+
+public class FirstTest {
+	
+	@Test
+	public void sayHi() {
+		System.out.print("Hi");
+	}
+
+}

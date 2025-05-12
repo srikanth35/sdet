@@ -1,0 +1,85 @@
+package selenium_testng;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.*;
+
+public class MakeMyTripSearchOfFlight {
+    WebDriver driver;
+    WebDriverWait wait;
+
+    @BeforeMethod
+    public void setup() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-notifications");
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        driver.manage().window().maximize();
+        driver.get("https://www.makemytrip.com/");
+    }
+
+    @Test
+    public void testRoundTripFlightSearch() throws InterruptedException {
+        // Dismiss popup
+    	  try {
+              // Wait briefly for popup to appear
+              WebDriverWait popupWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+              
+              // Check if "Personal Account" text exists in popup
+              WebElement personalAccountPopup = popupWait.until(ExpectedConditions.visibilityOfElementLocated(
+                  By.xpath("//*[contains(text(),'Personal Account')]")
+              ));
+
+              if (personalAccountPopup.isDisplayed()) {
+                  System.out.println("🔔 Personal Account popup detected. Attempting to close it...");
+                  // Try clicking somewhere else to dismiss it (like body or a close button)
+                  driver.findElement(By.xpath("//*[@id=\"SW\"]/div[1]/div[2]/div[2]/div/section/span")).click();
+                  Thread.sleep(1000); // Give it a moment to close
+              }
+          } catch (Exception e) {
+              System.out.println("✅ No 'Personal Account' popup appeared.");
+          }
+
+       
+
+        // Click Flights and Round Trip
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Flights']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li[@data-cy='roundTrip']"))).click();
+
+        // Enter TO: MAA
+        WebElement toTextBox = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"toCity\"]")));
+        toTextBox.sendKeys("MAA");
+        WebElement toOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[contains(text(),'Chennai')]")));
+        toOption.click();
+
+        // Select DEPARTURE date (e.g., 15th of next month)
+        WebElement departureDate = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"top-banner\"]/div[2]/div/div/div/div/div[2]/div[1]/div[3]/label/span")));
+        departureDate.click();
+        WebElement depDateSelect = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@aria-label='Wed Jun 25 2025']"))); // Adjust date
+        depDateSelect.click();
+
+        // Select RETURN date (e.g., 20th of next month)
+        WebElement retDateSelect = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@aria-label='Fri Jun 27 2025']"))); // Adjust date
+        retDateSelect.click();
+
+        // Click Search
+        driver.findElement(By.xpath("//a[text()='Search']")).click();
+
+        // Verify result page
+        boolean resultPage = wait.until(ExpectedConditions.urlContains("flights/results"));
+        assert resultPage : "Search results page not displayed!";
+    }
+
+    @AfterMethod
+    public void teardown() {
+        driver.quit();
+    }
+}
+

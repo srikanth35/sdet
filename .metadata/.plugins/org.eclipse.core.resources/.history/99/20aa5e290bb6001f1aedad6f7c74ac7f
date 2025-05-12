@@ -1,0 +1,11 @@
+package packagetest;
+
+import org.testng.annotations.Testt
+public class FirstTest {
+	
+	@Test
+	public void sayHi() {
+		System.out.print("Hi");
+	}
+
+}
