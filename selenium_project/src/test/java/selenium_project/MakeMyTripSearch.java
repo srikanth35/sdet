@@ -1,0 +1,88 @@
+package selenium_project;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
+
+public class MakeMyTripSearch {
+    public static void main(String[] args) throws InterruptedException {
+        // Set up Chrome Driver
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-notifications");
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        try {
+            driver.get("https://www.makemytrip.com/");
+            driver.manage().window().maximize();
+
+            // Close popup if present by clicking anywhere
+            try {
+                // Wait briefly for popup to appear
+                WebDriverWait popupWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+                
+                // Check if "Personal Account" text exists in popup
+                WebElement personalAccountPopup = popupWait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'Personal Account')]")
+                ));
+
+                if (personalAccountPopup.isDisplayed()) {
+                    System.out.println("🔔 Personal Account popup detected. Attempting to close it...");
+                    // Try clicking somewhere else to dismiss it (like body or a close button)
+                    driver.findElement(By.xpath("//*[@id=\"SW\"]/div[1]/div[2]/div[2]/div/section/span")).click();
+                    Thread.sleep(1000); // Give it a moment to close
+                }
+            } catch (Exception e) {
+                System.out.println("✅ No 'Personal Account' popup appeared.");
+            }
+
+
+            // Click Flights tab
+            WebElement flightsTab = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Flights']")));
+            flightsTab.click();
+
+            // Click Round Trip
+            WebElement roundTrip = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//li[@data-cy='roundTrip']")));
+            roundTrip.click();
+
+            // Enter FROM: HYD
+            WebElement fromInput = driver.findElement(By.id("fromCity"));
+            fromInput.click();
+            WebElement fromTextBox = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='From']")));
+            fromTextBox.sendKeys("HYD");
+            WebElement fromOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[contains(text(),'Hyderabad')]")));
+            fromOption.click();
+
+            // Enter TO: MAA
+            WebElement toTextBox = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"toCity\"]")));
+            toTextBox.sendKeys("MAA");
+            WebElement toOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[contains(text(),'Chennai')]")));
+            toOption.click();
+
+            // Select DEPARTURE date (e.g., 15th of next month)
+            WebElement departureDate = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"top-banner\"]/div[2]/div/div/div/div/div[2]/div[1]/div[3]/label/span")));
+            departureDate.click();
+            WebElement depDateSelect = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@aria-label='Wed Jun 25 2025']"))); // Adjust date
+            depDateSelect.click();
+
+            // Select RETURN date (e.g., 20th of next month)
+            WebElement retDateSelect = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@aria-label='Fri Jun 27 2025']"))); // Adjust date
+            retDateSelect.click();
+
+            // Click Search
+            WebElement searchButton = driver.findElement(By.xpath("//a[text()='Search']"));
+            searchButton.click();
+
+          
+        } catch (Exception e) {
+            System.out.println("Error occurred: " + e.getMessage());
+        } finally {
+            driver.quit();
+        }
+    }
+}
