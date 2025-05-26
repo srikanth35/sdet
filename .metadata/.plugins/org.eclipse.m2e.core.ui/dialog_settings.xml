@@ -53,6 +53,7 @@
 		<list key="name">
 		</list>
 		<list key="artifactId">
+			<item value="cucumber_project"/>
 			<item value="maven_project"/>
 			<item value="selenium_testng"/>
 			<item value="selenium_project"/>

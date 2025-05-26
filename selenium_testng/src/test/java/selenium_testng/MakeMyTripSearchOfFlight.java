@@ -59,7 +59,7 @@ public class MakeMyTripSearchOfFlight {
         fromInput.click();
         WebElement fromTextBox = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder='From']")));
         fromTextBox.sendKeys("HYD");
-        WebElement fromOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//p[contains(text(),'Hyderabad')]")));
+        WebElement fromOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"react-autowhatever-1-section-0-item-0\"]/div")));
         fromOption.click();
 
         // Enter TO: MAA
